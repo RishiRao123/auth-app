@@ -1,0 +1,11 @@
+# Ignore system files
+.DS_Store
+
+# Ignore logs
+*.log
+
+# Ignore environment variables anywhere in subfolders
+**/.env
+
+# Just in case
+.env

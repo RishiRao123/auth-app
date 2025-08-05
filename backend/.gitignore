@@ -1,0 +1,25 @@
+# Node dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Build outputs
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
+
+# Next.js or Vite build cache (if applicable)
+.next/
+.cache/
