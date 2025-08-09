@@ -14,8 +14,41 @@ const Signup = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "Name must be at least 3 characters";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -24,6 +57,8 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
+    if (!validate()) return;
 
     try {
       const url = "http://localhost:8000/auth/signup";
@@ -38,10 +73,8 @@ const Signup = () => {
     } catch (error) {
       const { response } = error;
 
-      if (response?.status === 400 && Array.isArray(response.data.errors)) {
-        response.data.errors.forEach((err) => {
-          handleError(err.message);
-        });
+      if (response?.status === 400 && response?.data?.message) {
+        handleError(response.data.message);
       } else {
         handleError("Something went wrong. Please try again.");
       }
@@ -55,7 +88,7 @@ const Signup = () => {
           Sign Up for Free
         </h2>
 
-        <form onSubmit={handleSignup} className='space-y-6'>
+        <form onSubmit={handleSignup} className='space-y-6' noValidate>
           {/* Name */}
           <div>
             <label
@@ -71,8 +104,13 @@ const Signup = () => {
               value={formData.name}
               onChange={handleChange}
               placeholder='Name'
-              className='mt-1 w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400'
+              className={`mt-1 w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.name && (
+              <p className='text-red-600 text-sm mt-1'>{errors.name}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -90,8 +128,13 @@ const Signup = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder='Email'
-              className='mt-1 w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400'
+              className={`mt-1 w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.email && (
+              <p className='text-red-600 text-sm mt-1'>{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -109,14 +152,19 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder='••••••••'
-              className='mt-1 w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400'
+              className={`mt-1 w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.password && (
+              <p className='text-red-600 text-sm mt-1'>{errors.password}</p>
+            )}
           </div>
 
           {/* Submit Button */}
           <button
             type='submit'
-            className='w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition duration-300 shadow-lg'
+            className='w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition duration-300 shadow-lg cursor-pointer '
           >
             Sign Up
           </button>

@@ -9,8 +9,8 @@ const signUp = async (req, res) => {
 
     if (user) {
       return res.status(400).json({
-        message: "User exists aldready, you can login",
-        sucess: false,
+        message: "User aldready exists, you can login",
+        success: false,
       });
     }
 
@@ -18,8 +18,8 @@ const signUp = async (req, res) => {
     const userModel = new User({ name, email, password: hashedPassword });
     await userModel.save();
     res.status(201).json({
-      message: "User created sucessfully",
-      sucess: true,
+      message: "User created successfully",
+      success: true,
     });
   } catch (error) {
     res.status(500).json({

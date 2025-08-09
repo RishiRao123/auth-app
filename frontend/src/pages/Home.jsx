@@ -37,7 +37,7 @@ const Home = () => {
         <p className='text-gray-600 mb-6'>We're glad to have you back.</p>
         <button
           onClick={handleLogout}
-          className='bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded transition duration-300'
+          className='bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded transition duration-300 cursor-pointer'
         >
           Logout
         </button>

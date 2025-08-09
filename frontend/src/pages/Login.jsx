@@ -13,8 +13,33 @@ const Login = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -23,6 +48,8 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!validate()) return;
 
     try {
       const response = await axios.post("http://localhost:8000/auth/login", {
@@ -46,14 +73,18 @@ const Login = () => {
       const { response } = error;
 
       if (response?.data?.errors?.length) {
-        response.data.errors.forEach((err) => {
-          handleError(`${err.field}: ${err.message}`);
+        const serverErrors = {};
+        response.data.errors.forEach(({ field, message }) => {
+          serverErrors[field] = message;
         });
+
+        setErrors(serverErrors);
       } else {
         handleError(response?.data?.message || "Login failed. Try again.");
       }
     }
   };
+
   return (
     <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-200 px-4'>
       <div className='w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10'>
@@ -61,7 +92,7 @@ const Login = () => {
           Log In to Your Account
         </h2>
 
-        <form onSubmit={handleLogin} className='space-y-6'>
+        <form onSubmit={handleLogin} className='space-y-6' noValidate>
           {/* Email */}
           <div>
             <label
@@ -77,8 +108,13 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder='Email'
-              className='mt-1 w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2  focus:ring-purple-400'
+              className={`mt-1 w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.email && (
+              <p className='text-red-600 text-sm mt-1'>{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -96,14 +132,19 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder='••••••••'
-              className='mt-1 w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2  focus:ring-purple-400'
+              className={`mt-1 w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.password && (
+              <p className='text-red-600 text-sm mt-1'>{errors.password}</p>
+            )}
           </div>
 
           {/* Submit Button */}
           <button
             type='submit'
-            className='w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition duration-300 shadow-lg'
+            className='w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition duration-300 shadow-lg cursor-pointer'
           >
             Log In
           </button>
